@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Text;
 
 namespace ChatClasses.Interfaces
 {
-    public interface IMessage
+    interface IClient
     {
-        string Message { get; set; }
         string IP { get; set; }
-        DateTime SendTime { get; set; }
-
+        string NickName { get; set; }
     }
 }

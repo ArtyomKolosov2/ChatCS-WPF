@@ -8,11 +8,8 @@ namespace ChatClasses.Classes
 {
     public class UserMessage : IMessage
     {
-        
         public string Message { get; set; }
         public string IP { get; set; }
-
-
-        
+        public DateTime SendTime { get; set; }
     }
 }
