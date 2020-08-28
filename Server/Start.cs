@@ -1,4 +1,5 @@
 ﻿using ChatClasses.Classes;
+using ChatClasses.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -47,7 +48,7 @@ namespace Server
 
         private List<Connection> clients { get; set; } = new List<Connection>();
 
-        public Server(string ip, int port=8888,int maxConnections=0)
+        public Server(string ip, int port=8888, int maxConnections=0)
         {
             ServerIP = IPAddress.Parse(ip);
             ServerPort = port;
@@ -59,7 +60,7 @@ namespace Server
             }
         }
 
-        private void SendMessageToAllConnections(string message, Connection connection)
+        private void SendMessageToAllConnections(UserMessage message, Connection connection)
         {
             foreach (var client in clients)
             {
@@ -96,7 +97,7 @@ namespace Server
     {
         public delegate void ConnectionDisconnectedHandler(Connection closedConnection);
 
-        public delegate void MessageRecievedHandler(string message, Connection connection);
+        public delegate void MessageRecievedHandler(UserMessage message, Connection connection);
 
         public event MessageRecievedHandler MessageRecievedEvent;
 
@@ -104,10 +105,10 @@ namespace Server
         private TcpClient Client { get; set; }
         private NetworkStream Stream { get; set; }
 
-        public int Cur;
+        public int ConnectionNumber;
         public Connection(TcpClient client, int num)
         {
-            Cur = num;
+            ConnectionNumber = num;
             Client = client;
             Stream = client.GetStream();
             Task dataTask = new Task(new Action(WaitForData));
@@ -120,29 +121,40 @@ namespace Server
             Stream.Write(data, 0, data.Length);
         }
 
+        public void SendData(UserMessage message)
+        {
+            Stream.Write(JsonSerializer.SerializeToUtf8Bytes(message));
+        }
+
         private void WaitForData()
         {
             while (true)
             {
                 try
                 {
-                    byte[] data = new byte[1024]; // буфер для получаемых данных
+                    byte[] data = new byte[10000]; // буфер для получаемых данных
                     StringBuilder builder = new StringBuilder();
+                    UserMessage recievedObject;
                     int bytes = 0;
                     do
                     {
                         bytes = Stream.Read(data, 0, data.Length);
-                        builder.Append(Encoding.UTF8.GetString(data, 0, bytes));
+                        recievedObject = (UserMessage)JsonSerializer.Deserialize(Encoding.UTF8.GetString(data, 0, bytes), typeof(UserMessage)); 
+                        builder.Append(recievedObject.ToString());
                     }
                     while (Stream.DataAvailable);
 
                     string message = builder.ToString();
                     Console.WriteLine(message);//вывод сообщения
-                    MessageRecievedEvent?.Invoke(message, this);
+                    MessageRecievedEvent?.Invoke(recievedObject, this);
+                }
+                catch (JsonException)
+                {
+                    Console.WriteLine("Incorect type server");
                 }
                 catch
                 {
-                    Console.WriteLine($"Подключение {Cur.ToString()} прервано!"); //соединение было прервано
+                    Console.WriteLine($"Подключение {ConnectionNumber.ToString()} прервано!"); //соединение было прервано
                     Disconnect();
                     break;
                 }

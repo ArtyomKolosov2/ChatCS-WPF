@@ -1,4 +1,5 @@
 ﻿using ChatClasses.Classes;
+using ChatClasses.Interfaces;
 using System;
 using System.Net;
 using System.Net.Sockets;
@@ -20,7 +21,8 @@ namespace ClientConsole
             while (true)
             {
                 Console.WriteLine("Input message:");
-                client.SendMessage(Console.ReadLine());
+                UserMessage message = new UserMessage { Message = Console.ReadLine() };
+                client.SendMessage(message);
             }
         }
     }
@@ -51,6 +53,14 @@ namespace ClientConsole
             }
         }
 
+        public void SendMessage(UserMessage message)
+        {
+            if (tcpClient != null && tcpClient.Connected)
+            {
+                tcpClient.GetStream().Write(JsonSerializer.SerializeToUtf8Bytes(message));
+            }
+        }
+
         private void ReciveMessages()
         {
             while (true)
@@ -63,12 +73,17 @@ namespace ClientConsole
                     do
                     {
                         bytes = tcpClient.GetStream().Read(data, 0, data.Length);
-                        builder.Append(Encoding.UTF8.GetString(data, 0, bytes));
+                        UserMessage recievedObject = (UserMessage)JsonSerializer.Deserialize(Encoding.UTF8.GetString(data, 0, bytes), typeof(UserMessage));
+                        builder.Append(recievedObject.ToString());
                     }
                     while (tcpClient.GetStream().DataAvailable);
-
+                    
                     string message = builder.ToString();
                     Console.WriteLine(message);
+                }
+                catch (JsonException)
+                {
+                    Console.WriteLine("Incorrect type");
                 }
                 catch (Exception ex)
                 {

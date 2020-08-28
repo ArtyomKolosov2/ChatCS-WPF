@@ -4,9 +4,9 @@ using System.Text;
 
 namespace ChatClasses.Interfaces
 {
-    interface IClient
+    interface IClientInfo
     {
-        string IP { get; set; }
-        string NickName { get; set; }
+        string NickName { get; }
+        int Id { get; set; }
     }
 }

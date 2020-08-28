@@ -5,8 +5,41 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ClientAppWpf"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="450" Width="400" Loaded="Window_Loaded">
     <Grid>
-
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <ListView x:Name="MessagesListView" Margin="10" Grid.RowSpan="2" Grid.Column="0">
+            
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Path=FormatedMessage}">
+                        <TextBlock.ToolTip>
+                            <ToolTip Content="{Binding Path=SendTime}"/>
+                        </TextBlock.ToolTip>
+                    </TextBlock>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+        <Grid Grid.Row="2">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <TextBox x:Name="MessageTextBox" Grid.Row="2" Grid.ColumnSpan="2" Margin="10"/>
+            <Button x:Name="SendButton" Grid.Column="2" Grid.Row="2" Margin="10" Click="SendButton_Click">Send</Button>
+        </Grid>
     </Grid>
 </Window>

@@ -8,8 +8,9 @@ namespace ChatClasses.Interfaces
     public interface IMessage
     {
         string Message { get; set; }
-        string IP { get; set; }
+        string FormatedMessage { get; }
+        string IP { get; }
         DateTime SendTime { get; set; }
-
     }
+    
 }
