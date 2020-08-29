@@ -82,7 +82,7 @@ namespace ChatClasses.Classes
                 catch (Exception ex) when (ex is SocketException || ex is IOException)
                 {
                     Console.WriteLine($"Error: {ex.Message} = {ex.GetType()} Подключение прервано!");
-                    RunEventDelegatesAsync(ConnectionLostEvent.GetInvocationList());
+                    RunEventDelegatesAsync(ConnectionLostEvent?.GetInvocationList());
                     break;
                 }
             }

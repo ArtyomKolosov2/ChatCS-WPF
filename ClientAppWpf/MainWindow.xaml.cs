@@ -62,12 +62,12 @@ namespace ClientAppWpf
 
         private void ChangeConnectionStatusImage_Disconnect()
         {
-            Dispatcher?.Invoke(new Action(() => ConnectionStatusImage.Source = new BitmapImage(new Uri("C:/Users/User/source/repos/ChatCSWPF/ClientAppWpf/Icons/disconnected.png", UriKind.RelativeOrAbsolute))));
+            Dispatcher?.Invoke(new Action(() => ConnectionStatusImage.Source = new BitmapImage(new Uri("Icons/disconnected.png", UriKind.Relative))));
         }
 
         private void ChangeConnectionStatusImage_Connect()
         {
-            Dispatcher?.Invoke(new Action(() => ConnectionStatusImage.Source = new BitmapImage(new Uri("C:/Users/User/source/repos/ChatCSWPF/ClientAppWpf/Icons/connected.png", UriKind.RelativeOrAbsolute))));
+            Dispatcher?.Invoke(new Action(() => ConnectionStatusImage.Source = new BitmapImage(new Uri("Icons/connected.png", UriKind.Relative))));
         }
         private void SendButton_Click(object sender, RoutedEventArgs e)
         {
@@ -85,6 +85,4 @@ namespace ClientAppWpf
             Dispatcher?.Invoke(new Action(() => Messages.Add(message)));
         }
     }
-
-    
 }

@@ -9,9 +9,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="disconnected.png" />
     <None Remove="Icons\connected.png" />
     <None Remove="Icons\disconnected.png" />
+    <None Remove="Icons\letter.ico" />
   </ItemGroup>
 
   <ItemGroup>
@@ -19,9 +19,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="disconnected.png" />
-    <Resource Include="Icons\connected.png" />
-    <Resource Include="Icons\disconnected.png" />
+    <Resource Include="Icons\connected.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Icons\disconnected.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Icons\letter.ico">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
 
 </Project>

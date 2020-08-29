@@ -5,8 +5,84 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ClientAppWpf"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="400" Loaded="Window_Loaded">
-    <Grid>
+        Title="Chat WPF Beta" Height="450" Width="400" Loaded="Window_Loaded">
+    <Window.Background>
+        <SolidColorBrush Color="#FFF3ECEC"/>
+    </Window.Background>
+    
+    <Window.Icon>
+        <BitmapImage UriSource="Icons/letter.ico"/>
+    </Window.Icon>
+    
+    <Window.Resources>
+        <SolidColorBrush x:Key="MainColorTheme" Color="Blue"/>
+        <Style x:Key="BorderStyle">
+            <Setter Property="Control.BorderThickness" Value="3"/>
+            <Setter Property="Control.BorderBrush" Value="{StaticResource MainColorTheme}"/>
+        </Style>
+        <Style x:Key="FontProperty">
+            <Setter Property="Control.FontFamily" Value="Arial"/>
+            <Setter Property="Control.FontSize" Value="17"/>
+        </Style>
+        <Style x:Key="RoundTextBox" TargetType="{x:Type TextBox}">
+            <Setter Property="Padding" Value="1"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type TextBox}">
+                        <Border x:Name="border" Opacity="1" CornerRadius="4" BorderBrush="{StaticResource MainColorTheme}" BorderThickness="2">
+                            <Border.Background>
+                                <SolidColorBrush Color="LightGray"/>
+                            </Border.Background>
+                            <ScrollViewer x:Name="PART_ContentHost"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="BorderBrush" TargetName="border" Value="Green"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
+        <Style x:Key="RoundCorner" TargetType="{x:Type Button}">
+            <Setter Property="Padding" Value="1"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Grid x:Name="grid">
+                            <Border x:Name="border" CornerRadius="4" BorderBrush="{StaticResource MainColorTheme}" BorderThickness="2">
+                                <Border.Background>
+                                    <RadialGradientBrush>
+                                        <GradientStop Offset="3.5" Color="Gray"/>
+                                        <GradientStop Offset="0" Color="White"/>
+                                    </RadialGradientBrush>
+                                </Border.Background>
+                                <ContentPresenter HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"
+                                          TextElement.FontWeight="Bold">
+                                </ContentPresenter>
+                            </Border>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" TargetName="border">
+                                    <Setter.Value>
+                                        <SolidColorBrush Color="White"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="BorderBrush" TargetName="border" Value="Green"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    
+    <Grid >
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
@@ -15,10 +91,10 @@
             <RowDefinition/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <ListView x:Name="MessagesListView" Margin="10" Grid.RowSpan="2" Grid.Column="0">
+        <ListView Style="{StaticResource BorderStyle}" x:Name="MessagesListView" Margin="10" Grid.RowSpan="2" Grid.Column="0">
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding Path=FormatedMessage}">
+                    <TextBlock Style="{StaticResource FontProperty}" Text="{Binding Path=FormatedMessage}">
                         <TextBlock.ToolTip>
                             <ToolTip Content="{Binding Path=SendTime}"/>
                         </TextBlock.ToolTip>
@@ -38,11 +114,11 @@
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
             <StackPanel  Orientation="Horizontal" FlowDirection="LeftToRight" Grid.Row="0" Grid.Column="2">
-                <Label Content="Connection:" VerticalAlignment="Center"/>
-                <Image x:Name="ConnectionStatusImage" Stretch="Uniform" Width="32" Height="32" Margin="5"/>
+                <Label FontWeight="Bold" FontSize="12" FontFamily="Arial" Content="Connection:" VerticalAlignment="Center"/>
+                <Image x:Name="ConnectionStatusImage" Source="Icons/disconnected.png" Stretch="Uniform" Width="32" Height="32" Margin="5"/>
             </StackPanel>
-            <TextBox x:Name="MessageTextBox" Grid.Row="2" Grid.ColumnSpan="2" Margin="10"/>
-            <Button x:Name="SendButton" Grid.Column="2" Grid.Row="2" Margin="10" Click="SendButton_Click">Send</Button>
+            <TextBox Style="{StaticResource RoundTextBox}" x:Name="MessageTextBox" Grid.Row="2" Grid.ColumnSpan="2" Margin="10, 10, 0, 10"/>
+            <Button Style="{StaticResource RoundCorner}" x:Name="SendButton" Grid.Column="2" Grid.Row="2" Margin="20, 10, 20, 10" Click="SendButton_Click">Send</Button>
         </Grid>
     </Grid>
 </Window>
