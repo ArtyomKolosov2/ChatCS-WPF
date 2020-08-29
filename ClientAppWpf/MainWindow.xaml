@@ -16,7 +16,6 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
         <ListView x:Name="MessagesListView" Margin="10" Grid.RowSpan="2" Grid.Column="0">
-            
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding Path=FormatedMessage}">
@@ -38,6 +37,10 @@
                 <ColumnDefinition/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
+            <StackPanel  Orientation="Horizontal" FlowDirection="LeftToRight" Grid.Row="0" Grid.Column="2">
+                <Label Content="Connection:" VerticalAlignment="Center"/>
+                <Image x:Name="ConnectionStatusImage" Stretch="Uniform" Width="32" Height="32" Margin="5"/>
+            </StackPanel>
             <TextBox x:Name="MessageTextBox" Grid.Row="2" Grid.ColumnSpan="2" Margin="10"/>
             <Button x:Name="SendButton" Grid.Column="2" Grid.Row="2" Margin="10" Click="SendButton_Click">Send</Button>
         </Grid>

@@ -9,7 +9,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="disconnected.png" />
+    <None Remove="Icons\connected.png" />
+    <None Remove="Icons\disconnected.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\ChatClasses\ChatClasses.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="disconnected.png" />
+    <Resource Include="Icons\connected.png" />
+    <Resource Include="Icons\disconnected.png" />
   </ItemGroup>
 
 </Project>

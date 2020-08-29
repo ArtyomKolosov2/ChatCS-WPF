@@ -15,7 +15,7 @@ namespace ChatClasses.Classes
         {
             get
             {
-                string result = $"[{SendTime.ToString("HH:mm:ss")}]: {Message}";
+                string result = $"[{SendTime.ToString("HH:mm:ss")}]:{NickName ?? string.Empty} {Message}";
                 return result;
             }
         }

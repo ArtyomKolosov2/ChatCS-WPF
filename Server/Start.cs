@@ -15,24 +15,13 @@ namespace Server
     {
         static void Main(string[] args)
         {
-            Server server = new Server("127.0.0.1", 8888);
-            server.StartServerListener();
-            /*IPAddress localAddr = IPAddress.Parse("127.0.0.1");
-            int port = 8888;
-            TcpListener server = new TcpListener(localAddr, port);
-            UserMessage message = new UserMessage { IP = localAddr.ToString(), Message = "Hello world!" };
-            BinaryFormatter formatter = new BinaryFormatter();
-            server.Start();
-            while (true)
+            string ip = "127.0.0.1";
+            if (args.Length > 1)
             {
-                
-                TcpClient tcp = server.AcceptTcpClient();
-                Console.WriteLine($"Клиент {tcp.Client} connected");
-                NetworkStream stream = tcp.GetStream();
-                stream.Write(JsonSerializer.SerializeToUtf8Bytes(message));
-                tcp.Close();
-                stream.Close();
-            }*/
+                ip = args[1];
+            }
+            Server server = new Server(ip, 8888);
+            server.StartServerListener();
         }
     }
 
@@ -50,7 +39,8 @@ namespace Server
 
         public Server(string ip, int port=8888, int maxConnections=0)
         {
-            ServerIP = IPAddress.Parse(ip);
+            ServerIP = IPAddress.Any;
+            Console.WriteLine(ServerIP);
             ServerPort = port;
             ServerListener = new TcpListener(ServerIP, ServerPort);
 
