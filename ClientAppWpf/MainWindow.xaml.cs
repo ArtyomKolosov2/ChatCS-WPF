@@ -1,4 +1,5 @@
 ﻿using ChatClasses.Classes;
+using ClientAppWpf.Modules;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -30,14 +31,18 @@ namespace ClientAppWpf
     /// </summary>
     public partial class MainWindow : Window
     {
+        public ICommand sendCommand { get; }
         public UserClient Client { get; private set; }
         public ObservableCollection<UserMessage> Messages { get; set; }
         public MainWindow()
         {
             InitializeComponent();
+            //SendCommand.Command = new RelayCommand(_ => SendButton_Click());
+
         }
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            
             Messages = new ObservableCollection<UserMessage>();
             MessagesListView.ItemsSource = Messages;
             
@@ -83,6 +88,11 @@ namespace ClientAppWpf
         private void NewMessage_Recieved(UserMessage message)
         {
             Dispatcher?.Invoke(new Action(() => Messages.Add(message)));
+        }
+
+        private void SendButton_Click_1(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }
