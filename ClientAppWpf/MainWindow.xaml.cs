@@ -37,12 +37,14 @@ namespace ClientAppWpf
         public MainWindow()
         {
             InitializeComponent();
+            
             //SendCommand.Command = new RelayCommand(_ => SendButton_Click());
 
         }
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            
+            GetIpBox getIp = new GetIpBox();
+            getIp.Show();
             Messages = new ObservableCollection<UserMessage>();
             MessagesListView.ItemsSource = Messages;
             

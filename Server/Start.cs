@@ -15,10 +15,16 @@ namespace Server
     {
         static void Main(string[] args)
         {
-            string ip = "127.0.0.1";
-            if (args.Length > 1)
+            string ip = null;
+            int port = 8888;
+            if (args.Length > 1) 
             {
                 ip = args[1];
+                if (args.Length == 3) 
+                {
+
+                    port = int.Parse(args[2]);
+                }
             }
             Server server = new Server(ip, 8888);
             server.StartServerListener();
