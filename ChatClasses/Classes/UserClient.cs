@@ -99,6 +99,11 @@ namespace ChatClasses.Classes
                 Stream.Close();
             }
         }
+
+        public async Task TryToConnectAsync()
+        {
+            await Task.Run(() => TryToConnect());
+        }
         public void TryToConnect()
         {
             while (Connect() == false)

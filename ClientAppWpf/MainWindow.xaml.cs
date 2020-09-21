@@ -54,7 +54,7 @@ namespace ClientAppWpf
             Client.ConnectionLostEvent += Client.TryToConnect;
             Client.ConnectionSuccessEvent += ChangeConnectionStatusImage_Connect;
             
-            await Task.Run(() => Client.TryToConnect());
+            await Client.TryToConnectAsync();
             Client.MessageRecivedEvent += NewMessage_Recieved;
             
             ((INotifyCollectionChanged)MessagesListView.ItemsSource).CollectionChanged += (s, e) =>
