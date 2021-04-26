@@ -1,84 +1,87 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
+using Common;
 
-namespace ChatClasses.Classes
+namespace Common.Models
 {
-    public class UserClient
+    public class UserClient 
     {
         public delegate void ConnectionLostHandler();
         public delegate void ConnectionSuccessHandler();
-        public delegate void MessageRecivedHandler(UserMessage message);
+        public delegate void MessageReceivedHandler(UserMessage message);
 
         public event ConnectionLostHandler ConnectionLostEvent;
         public event ConnectionSuccessHandler ConnectionSuccessEvent;
-        public event MessageRecivedHandler MessageRecivedEvent;
+        public event MessageReceivedHandler MessageReceivedEvent;
+
         public IPAddress ServerIP { get; set; }
-        public TcpClient tcpClient { get; private set; }
+        public TcpClient TcpClient { get; private set; }
         public NetworkStream Stream { get; private set; }
         public int ServerPort { get; set; }
-        private Task recieverTask { get; set; }
+        private Task ReceiverTask { get; set; }
+
         public UserClient(string ip, int port)
         {
             ServerIP = IPAddress.Parse(ip);
             ServerPort = port;
+        }
 
-        }
-        ~UserClient() { Disconnect(); }
-        public void SendMessage(string message)
-        {
-            if (tcpClient != null && tcpClient.Connected)
-            {
-                Stream.Write(Encoding.UTF8.GetBytes(message));
-            }
-        }
         public void SendMessage(UserMessage message)
         {
-            if (tcpClient != null && tcpClient.Connected)
+            if (TcpClient != null && TcpClient.Connected)
             {
-                Stream.Write(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message)));
+                Stream.Write(JsonSerializer.SerializeToUtf8Bytes(message));
             }
         }
-        private async void RunEventDelegatesAsync(Delegate[] delegates)
+
+        private static async void RunEventDelegatesAsync(Delegate[] delegates)
         {
-            Delegate[] Delegatelist = ConnectionLostEvent.GetInvocationList();
             foreach (var del in delegates)
             {
                 await Task.Run(() => del?.DynamicInvoke());
             }
         }
+
         private void ReciveMessages()
         {
             while (true)
             {
                 try
                 {
-                    byte[] data = new byte[1024];
-                    StringBuilder builder = new StringBuilder();
-                    UserMessage recievedObject;
-                    int bytes = 0;
+                    var builder = new StringBuilder();
+                    var data = new byte[GlobalConfig.GlobalConfig.Size];
+                    UserMessage receivedObject;
+
                     do
                     {
-                        bytes = Stream.Read(data, 0, data.Length);
-                        recievedObject = (UserMessage)JsonConvert.DeserializeObject(Encoding.UTF8.GetString(data, 0, bytes), typeof(UserMessage));
-                        builder.Append(recievedObject.ToString());
+
+                        var bytes = Stream.Read(data, 0, data.Length);
+                        receivedObject = JsonSerializer.Deserialize<UserMessage>(Encoding.UTF8.GetString(data, 0, bytes));
+
+                        builder.Append(receivedObject);
                     }
                     while (Stream.DataAvailable);
-                    MessageRecivedEvent?.Invoke(recievedObject);
-                    string message = builder.ToString();
+
+                    MessageReceivedEvent?.Invoke(receivedObject);
+
+                    var message = builder.ToString();
                     Console.WriteLine(message);
                 }
-                catch (JsonException)
+
+                catch (JsonException ex)
                 {
-                    Console.WriteLine("Incorrect type");
+                    Console.WriteLine(ex.Message);
                     break;
 
                 }
+
                 catch (Exception ex) when (ex is SocketException || ex is IOException)
                 {
                     Console.WriteLine($"Error: {ex.Message} = {ex.GetType()} Подключение прервано!");
@@ -90,33 +93,41 @@ namespace ChatClasses.Classes
 
         public void Disconnect()
         {
-            if (tcpClient != null)
+            if (TcpClient != null)
             {
-                tcpClient.Close();
+                TcpClient.Close();
             }
             if (Stream != null)
             {
                 Stream.Close();
             }
         }
+
+        public async Task TryToConnectAsync()
+        {
+            await Task.Run(() => TryToConnect());
+        }
+
         public void TryToConnect()
         {
-            while (Connect() == false)
+            while (!Connect())
             {
                 Console.WriteLine("Connection lost... Retrying");
                 Thread.Sleep(5000);
             }
         }
+
         private bool Connect()
         {
-            bool connectResult = false;
+            var connectResult = false;
             try
             {
-                tcpClient = new TcpClient();
-                tcpClient.Connect(ServerIP, ServerPort);
-                Stream = tcpClient.GetStream();
-                recieverTask = new Task(new Action(ReciveMessages));
-                recieverTask.Start();
+                TcpClient = new TcpClient();
+                TcpClient.Connect(ServerIP, ServerPort);
+                Stream = TcpClient.GetStream();
+                ReceiverTask = new Task(ReciveMessages);
+                ReceiverTask.Start();
+
                 connectResult = true;
                 ConnectionSuccessEvent?.Invoke();
             }
@@ -124,6 +135,7 @@ namespace ChatClasses.Classes
             {
                 connectResult = false;
             }
+
             return connectResult;
         }
     }
