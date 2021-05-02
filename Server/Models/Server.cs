@@ -31,7 +31,7 @@ namespace Server.Models
         }
 
 
-        private void SendMessageToAllConnections(UserMessage message, Connection connection)
+        private void SendMessageToAllConnections(ReadOnlySpan<byte> message, Connection connection)
         {
             
             foreach (var client in Clients.Values)

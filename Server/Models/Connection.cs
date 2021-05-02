@@ -6,6 +6,8 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Common.Config;
 using Common.Models;
+using Common.Utils;
+
 
 namespace Server.Models
 {
@@ -13,7 +15,7 @@ namespace Server.Models
     {
         public delegate void ConnectionDisconnectedHandler(Connection closedConnection);
 
-        public delegate void MessageReceivedHandler(UserMessage message, Connection connection);
+        public delegate void MessageReceivedHandler(ReadOnlySpan<byte> message, Connection connection);
 
         public event MessageReceivedHandler MessageReceivedEvent;
 
@@ -34,9 +36,9 @@ namespace Server.Models
             dataTask.Start();
         }
 
-        public void SendData(UserMessage message)
+        public void SendData(ReadOnlySpan<byte> message, int bytes = GlobalConfig.Size)
         {
-            Stream.Write(GlobalConfig.Encoding.GetBytes(JsonSerializer.Serialize(message)));
+            Stream.Write(message);
         }
 
         private void WaitForData()
@@ -47,23 +49,20 @@ namespace Server.Models
                 {
                     var data = new byte[GlobalConfig.Size]; 
                     var builder = new StringBuilder();
-                    UserMessage receivedObject;
+                    ReadOnlySpan<byte> realData;
 
                     do
                     {
                         var bytes = Stream.Read(data, 0, data.Length);
-                        receivedObject = JsonSerializer.Deserialize<UserMessage>
-                        (
-                            GlobalConfig.Encoding.GetString(data, 0, bytes)
-                        );
+                        realData = new ReadOnlySpan<byte>(data, 0, bytes);
 
-                        builder.Append(receivedObject);
+                        builder.Append(bytes);
                     }
                     while (Stream.DataAvailable);
 
                     var message = builder.ToString();
                     Console.WriteLine(message);
-                    MessageReceivedEvent?.Invoke(receivedObject, this);
+                    MessageReceivedEvent?.Invoke(realData, this);
                 }
                 catch (JsonException ex)
                 {

@@ -41,7 +41,7 @@ namespace Common.Models
             if (TcpClient != null && TcpClient.Connected)
             {
                 var jsonString = JsonSerializer.Serialize(message);
-                Stream.Write(AesEncryptionUtil.EncryptStringToAes(jsonString));
+                Stream.Write( RijndaelExample.EncryptStringToBytes(jsonString, RijndaelExample.GetKey(GlobalConfig.CypherKey), new byte[16]));
             }
         }
 
@@ -60,15 +60,16 @@ namespace Common.Models
                 try
                 {
                     var builder = new StringBuilder();
-                    var data = new byte[Config.GlobalConfig.Size];
+                    var data = new byte[GlobalConfig.Size];
                     UserMessage receivedObject;
 
                     do
                     {
 
                         var bytes = Stream.Read(data, 0, data.Length);
+                        var realData = new ReadOnlySpan<byte>(data, 0, bytes);
                         var jsonString =
-                            AesEncryptionUtil.DecryptStringFromAes(GlobalConfig.Encoding.GetString(data, 0, bytes));
+                            RijndaelExample.DecryptStringFromBytes(realData.ToArray(), RijndaelExample.GetKey(GlobalConfig.CypherKey), new byte[16]);
                         receivedObject = JsonSerializer.Deserialize<UserMessage>(jsonString);
 
                         builder.Append(receivedObject);
