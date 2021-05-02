@@ -8,6 +8,9 @@ using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using Common;
+using Common.Config;
+using Common.Utils;
+
 
 namespace Common.Models
 {
@@ -37,7 +40,8 @@ namespace Common.Models
         {
             if (TcpClient != null && TcpClient.Connected)
             {
-                Stream.Write(JsonSerializer.SerializeToUtf8Bytes(message));
+                var jsonString = JsonSerializer.Serialize(message);
+                Stream.Write(AesEncryptionUtil.EncryptStringToAes(jsonString));
             }
         }
 
@@ -56,14 +60,16 @@ namespace Common.Models
                 try
                 {
                     var builder = new StringBuilder();
-                    var data = new byte[GlobalConfig.GlobalConfig.Size];
+                    var data = new byte[Config.GlobalConfig.Size];
                     UserMessage receivedObject;
 
                     do
                     {
 
                         var bytes = Stream.Read(data, 0, data.Length);
-                        receivedObject = JsonSerializer.Deserialize<UserMessage>(Encoding.UTF8.GetString(data, 0, bytes));
+                        var jsonString =
+                            AesEncryptionUtil.DecryptStringFromAes(GlobalConfig.Encoding.GetString(data, 0, bytes));
+                        receivedObject = JsonSerializer.Deserialize<UserMessage>(jsonString);
 
                         builder.Append(receivedObject);
                     }

@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Security.Cryptography;
 using System.Text;
 using Common.Models;
+using Common.Utils;
 
 namespace Server.Models
 {
@@ -26,8 +30,10 @@ namespace Server.Models
             ServerListener = new TcpListener(ServerIp, ServerPort);
         }
 
+
         private void SendMessageToAllConnections(UserMessage message, Connection connection)
         {
+            
             foreach (var client in Clients.Values)
             {
                 if (connection.Id != client.Id)

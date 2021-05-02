@@ -4,7 +4,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Common.GlobalConfig;
+using Common.Config;
 using Common.Models;
 
 namespace Server.Models
@@ -36,7 +36,7 @@ namespace Server.Models
 
         public void SendData(UserMessage message)
         {
-            Stream.Write(JsonSerializer.SerializeToUtf8Bytes(message));
+            Stream.Write(GlobalConfig.Encoding.GetBytes(JsonSerializer.Serialize(message)));
         }
 
         private void WaitForData()
@@ -52,7 +52,11 @@ namespace Server.Models
                     do
                     {
                         var bytes = Stream.Read(data, 0, data.Length);
-                        receivedObject = JsonSerializer.Deserialize<UserMessage>(Encoding.UTF8.GetString(data, 0, bytes));
+                        receivedObject = JsonSerializer.Deserialize<UserMessage>
+                        (
+                            GlobalConfig.Encoding.GetString(data, 0, bytes)
+                        );
+
                         builder.Append(receivedObject);
                     }
                     while (Stream.DataAvailable);
@@ -63,10 +67,11 @@ namespace Server.Models
                 }
                 catch (JsonException ex)
                 {
-                    Console.WriteLine(ex.Message);
+                    Console.WriteLine($"{ex.Message} {ex.GetType()}");
                 }
-                catch
+                catch (Exception ex)
                 {
+                    Console.WriteLine(ex.Message);
                     Console.WriteLine($"Подключение {Id} прервано!");
                     Disconnect();
                     break;

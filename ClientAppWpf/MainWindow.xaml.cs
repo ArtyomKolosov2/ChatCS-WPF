@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Windows;
 using System.Windows.Media.Imaging;
-using Common.GlobalConfig;
+using Common.Config;
 
 namespace ClientAppWpf
 {

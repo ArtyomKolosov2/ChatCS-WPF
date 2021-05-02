@@ -1,17 +1,8 @@
-﻿using Common.Models;
-using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Net.Sockets;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
-using Common.GlobalConfig;
+﻿using Common.Config;
 
 namespace Server
 {
-    class Start
+    static class Start
     {
         static void Main(string[] args)
         {
